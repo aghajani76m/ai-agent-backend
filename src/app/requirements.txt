@@ -8,3 +8,7 @@ anyio
 pydantic-settings
 openai
 python-multipart
+httpx
+pytest
+testcontainers
+deprecation

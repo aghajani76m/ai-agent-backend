@@ -13,7 +13,7 @@ MINIO_SECRET=minioadmin123
 MINIO_BUCKET=files
 
 # OpenAI
-# OPENAI_API_KEY=sk-...
+OPENAI_API_KEY=sk-...
 
 # OpenAI temperature
 # TEMPERATURE=0.7

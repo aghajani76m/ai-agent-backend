@@ -41,6 +41,6 @@ def on_startup():
     """
     Wait a few seconds for ES to be reachable, then create indices.
     """
-    time.sleep(5)
+    time.sleep(120)
     es = get_es_client()
     create_indices(es)

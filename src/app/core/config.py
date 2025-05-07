@@ -5,7 +5,8 @@ class Settings(BaseSettings):
     # این مدل‌کانفیگ به Pydantic v2 می‌گوید از فایل .env بخواند
     model_config = SettingsConfigDict(
         env_file = ".env",
-        env_file_encoding = "utf-8"
+        env_file_encoding = "utf-8",
+        extra="ignore" 
     )
 
     # Server
@@ -13,7 +14,7 @@ class Settings(BaseSettings):
     SERVER_PORT: int = Field(8000, env="SERVER_PORT")
 
     # Elasticsearch
-    ES_HOST: str = Field("elasticsearch", env="ES_HOST")
+    ES_HOST: str = Field("localhost", env="ES_HOST")
     ES_PORT: int = Field(9200, env="ES_PORT")
     ES_USER: str | None = Field(None, env="ES_USER")
     ES_PASS: str | None = Field(None, env="ES_PASS")
@@ -30,7 +31,7 @@ class Settings(BaseSettings):
     FILES_BUCKET: str = "attachments"
     MINIO_REGION: str = "us-east-1"
     # OpenAI
-    OPENAI_API_KEY: str = Field("aa-rfrLhqmSMZ7ua4oWSDqovqATwH2Zkg2txnlT9nImIkEvOB1n", env="OPENAI_API_KEY")
+    OPENAI_API_KEY: str = Field(..., env="OPENAI_API_KEY")
     # TEMPERATURE: float = Field(0.7, env="TEMPERATURE")
 
 settings = Settings()

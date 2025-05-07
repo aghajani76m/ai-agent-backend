@@ -1,9 +1,11 @@
 import os
 import time
-
+import json
+import urllib
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from testcontainers.elasticsearch import ElasticsearchContainer
+from testcontainers.elasticsearch import ElasticSearchContainer
 from testcontainers.minio import MinioContainer
 
 from app.main import app
@@ -13,10 +15,10 @@ from app.core.config import settings
 
 @pytest.fixture(scope="session")
 def es_container():
-    with ElasticsearchContainer("elasticsearch:8.12.0") as es:
+    with ElasticSearchContainer("elasticsearch:8.12.0") as es:
         os.environ["ELASTICSEARCH_URL"] = es.get_url()
         # wait for ES
-        time.sleep(10)
+        time.sleep(60)
         yield es
 
 @pytest.fixture(scope="session")
@@ -25,14 +27,15 @@ def minio_container():
         host = mi.get_container_host_ip()
         port = mi.get_exposed_port(9000)
         os.environ["MINIO_PUBLIC_ENDPOINT"] = f"http://localhost:{port}"
-        os.environ["MINIO_INTERNAL_ENDPOINT"] = f"minio:{port}"
+        os.environ["MINIO_INTERNAL_ENDPOINT"] = f"localhost:{port}"
         os.environ["MINIO_KEY"] = mi.access_key
         os.environ["MINIO_SECRET"] = mi.secret_key
-        os.environ["MINIO_SECURE"] = False
+        # os.environ["MINIO_SECURE"] = False
+        os.environ["MINIO_BUCKET"] = "files"
         os.environ["FILES_BUCKET"] = "attachments"
         os.environ["MINIO_REGION"] = "us-east-1"
         # give MinIO a moment
-        time.sleep(2)
+        time.sleep(60)
         yield mi
 
 @pytest.fixture(autouse=True)
@@ -67,8 +70,8 @@ def test_full_flow(client):
     assert conv["agent_id"] == agent_id
     conv_id = conv["id"]
 
-    # 3) Send 3 turns
-    for i in range(3):
+    # 3) Send 10 turns
+    for i in range(10):
         resp = client.post(f"/api/v1/conversations/{conv_id}/messages",
                            json={"content": f"Hello {i}", "attachments": []})
         assert resp.status_code == 201
@@ -90,8 +93,11 @@ def test_full_flow(client):
     assert meta["url"].startswith("http")
 
     # 6) Check token usage summary
-    toks = client.get(f"/api/v1/conversations/{conv_id}/tokens").json()
-    assert "total_tokens" in toks
+    toks = client.get(f"/api/v1/conversations/{conv_id}/tokens")
+    assert toks.status_code == 200  # بررسی موفق بودن پاسخ
+    total_tokens = toks.json()  # چون json() مقدار عددی برمی‌گرداند
+    assert isinstance(total_tokens, int)
+    assert total_tokens > 0
 
     # 7) Health endpoint
     health = client.get("/health").json()

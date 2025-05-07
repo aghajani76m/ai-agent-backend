@@ -168,8 +168,6 @@ def list_messages(
             "content": {
                 "application/json": {
                     "example": {
-                        "prompt_tokens": 120,
-                        "completion_tokens": 80,
                         "total_tokens": 200
                     }
                 }

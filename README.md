@@ -21,7 +21,7 @@ git clone https://github.com/you/ai-agent-backend.git
 cd ai-agent-backend
 ```
 
-Open .env and set the following values:
+Open .env and set the following values (like env_example file):
 
 ELASTICSEARCH_URL=http://localhost:9200
 
@@ -34,6 +34,8 @@ MINIO_KEY=minioadmin
 MINIO_SECRET=minioadmin
 
 FILES_BUCKET=attachments
+
+OPENAI_API_KEY=sk-...
 
 ### 2. Run with Docker Compose
 ```bash
@@ -90,11 +92,11 @@ Docker & Docker Compose
 
 - Python 3.9+
 
-- pip install -r requirements.txt
+- pip install -r src/app/requirements.txt
 
 ### 6. Run tests
 ```bash
-- pytest --maxfail=1 --disable-warnings -q
+python -m pytest
 ```
 
 All tests should pass without errors.
