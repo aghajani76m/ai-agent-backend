@@ -3,39 +3,39 @@
 ## 1. System Layers
 
 ┌────────────────────────┐
-│     FastAPI API        │
-│  (Routers & Endpoints) │
-└────────────────────────┘
-            │
-            ▼
-┌────────────────────────┐
-│     Service Layer      │
-│ • AgentService         │
-│ • ConversationService  │
-│ • FileService          │
-│ • StorageService       │
-└────────────────────────┘
-            │
-            ▼
-┌────────────────────────┐
-│     Persistence        │
-│ • Elasticsearch (ES)   │
-│   – Agents index       │
-│   – Conversations idx  │
-│   – Messages index     │
-│   – Files metadata     │
-└────────────────────────┘
-            │
-            ▼
-┌────────────────────────┐
-│   Object Storage       │
-│   (MinIO / S3-Compat)  │
-└────────────────────────┘
+    │     FastAPI API        │
+    │  (Routers & Endpoints) │
+    └────────────────────────┘
+                │
+                ▼
+    ┌────────────────────────┐
+    │     Service Layer      │
+    │ • AgentService         │
+    │ • ConversationService  │
+    │ • FileService          │
+    │ • StorageService       │
+    └────────────────────────┘
+                │
+                ▼
+    ┌────────────────────────┐
+    │     Persistence        │
+    │ • Elasticsearch (ES)   │
+    │   – Agents index       │
+    │   – Conversations index│
+    │   – Messages index     │
+    │   – Files metadata     │
+    └────────────────────────┘
+                │
+                ▼
+    ┌────────────────────────┐
+    │   Object Storage       │
+    │   (MinIO / S3-Compat)  │
+    └────────────────────────┘
 
-┌────────────────────────┐
-│      LLM Client        │
-│  (OpenAI / HF / etc.)  │
-└────────────────────────┘
+    ┌────────────────────────┐
+    │      LLM Client        │
+    │  (OpenAI / HF / etc.)  │
+    └────────────────────────┘
 
 **Flow at a glance**  
 1. HTTP request → FastAPI router  

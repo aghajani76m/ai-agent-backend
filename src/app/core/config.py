@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     FILES_BUCKET: str = "attachments"
     MINIO_REGION: str = "us-east-1"
     # OpenAI
-    OPENAI_API_KEY: str = Field("aa-gH48KCQ475w3ffeBXXRweoiKcwZORnwxoYYBEjsWOp8nOY93", env="OPENAI_API_KEY")
+    OPENAI_API_KEY: str = Field("aa-rfrLhqmSMZ7ua4oWSDqovqATwH2Zkg2txnlT9nImIkEvOB1n", env="OPENAI_API_KEY")
     # TEMPERATURE: float = Field(0.7, env="TEMPERATURE")
 
 settings = Settings()

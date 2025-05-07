@@ -24,11 +24,13 @@ def minio_container():
     with MinioContainer("minio/minio:RELEASE.2023-01-25T00-19-54Z") as mi:
         host = mi.get_container_host_ip()
         port = mi.get_exposed_port(9000)
-        os.environ["MINIO_PUBLIC_ENDPOINT"] = f"http://{host}:{port}"
-        os.environ["MINIO_INTERNAL_ENDPOINT"] = f"{host}:{port}"
-        os.environ["MINIO_ACCESS_KEY"] = mi.access_key
-        os.environ["MINIO_SECRET_KEY"] = mi.secret_key
-        os.environ["FILES_BUCKET"] = "test-bucket"
+        os.environ["MINIO_PUBLIC_ENDPOINT"] = f"http://localhost:{port}"
+        os.environ["MINIO_INTERNAL_ENDPOINT"] = f"minio:{port}"
+        os.environ["MINIO_KEY"] = mi.access_key
+        os.environ["MINIO_SECRET"] = mi.secret_key
+        os.environ["MINIO_SECURE"] = False
+        os.environ["FILES_BUCKET"] = "attachments"
+        os.environ["MINIO_REGION"] = "us-east-1"
         # give MinIO a moment
         time.sleep(2)
         yield mi
@@ -54,7 +56,7 @@ def test_full_flow(client):
         "description": "Integration test bot",
         "welcomeMessage": "Hi!",
         "systemPrompt": "You are a test assistant.",
-        "responseSettings": {"tone": "friendly", "verbosity": "short", "creativity": 0.1, "model": "gpt-test"}
+        "responseSettings": {"tone": "friendly", "verbosity": "short", "creativity": 0.1, "model": "gpt-4o-mini"}
     }
     ag = client.post("/api/v1/agents", json=agent_payload).json()
     assert ag["name"] == "TestBot"

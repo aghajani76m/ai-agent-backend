@@ -19,24 +19,25 @@ This service lets you spin up AI-powered chat agents, manage conversations, uplo
 ```bash
 git clone https://github.com/you/ai-agent-backend.git
 cd ai-agent-backend
-cp .env.example .env
 ```
 
 Open .env and set the following values:
 
 ELASTICSEARCH_URL=http://localhost:9200
 MINIO_PUBLIC_ENDPOINT=http://localhost:9000
-MINIO_INTERNAL_ENDPOINT=localhost:9000
-MINIO_ACCESS_KEY=minioadmin
-MINIO_SECRET_KEY=minioadmin
-FILES_BUCKET=agent-files
+MINIO_INTERNAL_ENDPOINT=minio:9000
+MINIO_KEY=minioadmin
+MINIO_SECRET=minioadmin
+FILES_BUCKET=attachments
 
 ### 2. Run with Docker Compose
 docker compose up --build -d
 This starts:
 
 - Elasticsearch on :9200
+
 - MinIO on :9000 (console on :9001)
+
 - FastAPI app on :8000
 
 ### 3. Verify & Initialize
@@ -68,7 +69,7 @@ Open your browser:
 | `/api/v1/agents`            | POST   | Create a new agent |
 | `/api/v1/agents/{agent_id}` | GET    | Get agent details  |
 | `/api/v1/agents/{agent_id}` | PUT    | Update agent       |
-| `/api/v1/agents/{agent_id}` | DELETE |                    |
+| `/api/v1/agents/{agent_id}` | DELETE | Delete agent       |
 
 ### 5. 🧪 Testing
 This project includes an end-to-end integration test (tests/test_e2e.py) that spins up real Elasticsearch and MinIO via Testcontainers.
@@ -78,7 +79,7 @@ Docker & Docker Compose
 
 - Python 3.9+
 
-- poetry install (or) pip install -r requirements.txt
+- pip install -r requirements.txt
 
 ### 6. Run tests
 - pytest --maxfail=1 --disable-warnings -q
