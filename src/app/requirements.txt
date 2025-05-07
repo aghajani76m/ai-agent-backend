@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+elasticsearch==8.12.0
+minio
+pydantic
+python-dotenv
+anyio
+pydantic-settings
+openai
+python-multipart

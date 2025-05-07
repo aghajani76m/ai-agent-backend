@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  elasticsearch:
+    image: elasticsearch:8.12.0
+    container_name: elasticsearch
+    environment:
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - network.host=0.0.0.0
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  minio:
+    image: minio/minio:RELEASE.2023-01-25T00-19-54Z
+    container_name: minio
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Console
+    volumes:
+      - miniodata:/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-agent-backend
+    command: >
+      uvicorn app.main:app
+      --host ${SERVER_HOST}
+      --port ${SERVER_PORT}
+      --reload
+    volumes:
+      - ./src:/usr/src/app
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    depends_on:
+      - elasticsearch
+      - minio
+    environment:
+      - SERVER_HOST=${SERVER_HOST}
+      - SERVER_PORT=${SERVER_PORT}
+      - ES_HOST=elasticsearch
+      - ES_PORT=9200
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_KEY=${MINIO_KEY}
+      - MINIO_SECRET=${MINIO_SECRET}
+      - MINIO_BUCKET=${MINIO_BUCKET}
+      # - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # - TEMPERATURE=${TEMPERATURE}
+
+volumes:
+  esdata:
+  miniodata:
