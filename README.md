@@ -24,14 +24,22 @@ cd ai-agent-backend
 Open .env and set the following values:
 
 ELASTICSEARCH_URL=http://localhost:9200
+
 MINIO_PUBLIC_ENDPOINT=http://localhost:9000
+
 MINIO_INTERNAL_ENDPOINT=minio:9000
+
 MINIO_KEY=minioadmin
+
 MINIO_SECRET=minioadmin
+
 FILES_BUCKET=attachments
 
 ### 2. Run with Docker Compose
+```bash
 docker compose up --build -d
+```
+
 This starts:
 
 - Elasticsearch on :9200
@@ -44,7 +52,10 @@ This starts:
 FastAPI’s startup hook will wait for Elasticsearch and then create required indices.
 
 Check the health endpoint:
+```bash
 curl http://localhost:8000/health
+```
+
 You should see:
 ```bash
 {
@@ -82,7 +93,10 @@ Docker & Docker Compose
 - pip install -r requirements.txt
 
 ### 6. Run tests
+```bash
 - pytest --maxfail=1 --disable-warnings -q
+```
+
 All tests should pass without errors.
 
 
