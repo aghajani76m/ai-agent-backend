@@ -17,7 +17,7 @@ This service lets you spin up AI-powered chat agents, manage conversations, uplo
 ### 1. Clone & Configure
 
 ```bash
-git clone https://github.com/you/ai-agent-backend.git
+git clone https://github.com/aghajani76m/ai-agent-backend.git
 cd ai-agent-backend
 ```
 
