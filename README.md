@@ -96,6 +96,7 @@ Docker & Docker Compose
 
 ### 6. Run tests
 ```bash
+export PYTHONPATH="$PWD/src"
 python -m pytest
 ```
 
