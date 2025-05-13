@@ -11,7 +11,16 @@ def create_indices(es):
                     "system_prompt": {"type": "text"},
                     "response_settings": {"type": "object"},
                     "created_at": {"type": "date"},
-                    "updated_at": {"type": "date"}
+                    "updated_at": {"type": "date"},
+                    "keywords_list": {"type": "keyword"},
+                    "llm_model_name": {"type": "keyword"},
+                    "release_type": {"type": "keyword"},
+                    "tone": {"type": "keyword"},
+                    "creativity": {"type": "keyword"},
+                    "response_length": {"type": "keyword"},
+                    "language": {"type": "keyword"},
+                    "exception_words": {"type": "keyword"},
+                    "indices": {"type": "keyword"}
                 }
             }
         },
@@ -39,7 +48,13 @@ def create_indices(es):
                     "conversation_id": {"type": "keyword"},
                     "role": {"type": "keyword"},
                     "content": {"type": "text"},
-                    "token_usage": {"type": "integer"},
+                    "token_usage": {
+                        "type": "nested",
+                        "properties": {
+                        "token_input":  { "type": "integer" },
+                        "token_output": { "type": "integer" }
+                        }
+                    },
                     "created_at": {"type": "date"},
                     "attachments": {
                         "type": "nested",

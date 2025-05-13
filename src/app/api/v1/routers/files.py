@@ -9,7 +9,7 @@ router = APIRouter(prefix="/files", tags=["files"])
 
 
 def get_file_service(minio_client: Minio = Depends(get_minio_client)):
-    return FileService(minio_client)
+    return FileService()
 
 
 @router.post(

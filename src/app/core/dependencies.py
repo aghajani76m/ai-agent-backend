@@ -3,7 +3,7 @@ from app.core.config import settings
 from functools import lru_cache
 import os
 import openai
-from app.core.llm_client import llm  
+from app.llm.llm_client import llm_async
 
 @lru_cache()
 def get_es_client() -> Elasticsearch:
@@ -15,7 +15,7 @@ def get_es_client() -> Elasticsearch:
     return es
 
 def get_llm_client():
-    return llm
+    return llm_async
 
 # src/app/core/dependencies.py
 from minio import Minio

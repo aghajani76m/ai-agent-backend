@@ -12,3 +12,6 @@ httpx
 pytest
 testcontainers
 deprecation
+PyPDF2
+pydantic[email]
+aiohttp
