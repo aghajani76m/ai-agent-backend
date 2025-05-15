@@ -5,7 +5,7 @@ from elasticsearch import Elasticsearch
 
 from app.core.config import settings
 from app.core.dependencies import get_es_client
-from app.db.indices import create_indices
+from app.db.create_indices import create_indices
 from app.api.v1.routers.agents import router as agents_router
 from app.api.v1.routers.conversations import router as conv_router
 from app.api.v1.routers.files import router as files_router
