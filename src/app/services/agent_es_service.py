@@ -1,11 +1,11 @@
 import uuid
 from datetime import datetime
 from typing import List, Optional
-
+from typing import Union
 from elasticsearch import Elasticsearch, NotFoundError
 from app.api.v1.schemas.agents import AgentCreate, AgentInDB, AgentUpdate, AgentOut, ResponseSettings
 from app.db.indices.agents import agent_index_name
-from app.utils.flatten_dict import flatten_dict
+from app.utils.deep_merge import deep_merge
 
 INDEX = agent_index_name
 
@@ -24,6 +24,7 @@ class AgentService:
         now = datetime.utcnow()
         # produce snake_case keys, skip None
         doc = data.dict(by_alias=True, exclude_none=True)
+        doc["agent_id"]  = agent_id
         # set timestamps
         doc["created_at"] = now
         doc["updated_at"] = now
@@ -99,37 +100,77 @@ class AgentService:
     #     return self.get_agent(agent_id)
 
     def update_agent(self, agent_id: str, data: AgentUpdate) -> AgentOut:
-        """
-        - Build a partial doc from only provided (non-None) fields  
-        - Always bump updated_at  
-        - Elasticsearch _update with doc  
-        - Return None if agent does not exist  
-        - Otherwise fetch & return the new state  
-        """
-        partial = data.dict(
-            by_alias=True, exclude_unset=True, exclude_none=True
+        # 1. فیلدهای ارسالی کاربر
+        incoming = data.dict(
+            by_alias=True,
+            exclude_unset=True,
+            exclude_none=True
         )
-        if not partial:
+        if not incoming:
             return self.get_agent(agent_id)
 
-        # flatten nested payload
-        doc = flatten_dict(partial)
-        # هم updated_at را ست می‌کنیم
-        doc["updated_at"] = datetime.utcnow()
+        # 2. سند فعلی از ES (یا از cache/DB)
+        existing = self.get_agent(agent_id)
+        if not existing:
+            return None
+        src = existing.dict(by_alias=True)
+        src.pop("id", None) 
 
+        # 3. deep-merge
+        merged = deep_merge(src, incoming)
+        merged["updated_at"] = datetime.utcnow()
+        merged["agent_id"] = agent_id
+        # 4. ارسال یک‌جای merged به ES
         self.es.update(
             index=INDEX,
             id=agent_id,
-            body={"doc": doc}
+            body={"doc": merged}
         )
         return self.get_agent(agent_id)
 
+    def delete_agent_indices(
+        self,
+        agent_id: str,
+        index_patterns: Union[str, list[str]]
+    ) -> None:
+        """
+        حذف تمام ایندکس‌ها یا الیاس‌های مربوط به یک ایجنت.
+        پارامتر index_patterns می‌تواند:
+        - رشته‌ای با قالب wildcard مثل "agent-<agent_id>-*"
+        - یا لیستی از چنین الگوها
+        اگر ایندکسی یافت نشود، نادیده گرفته می‌شود.
+        """
+        if isinstance(index_patterns, str):
+            patterns = [index_patterns]
+        else:
+            patterns = index_patterns
+
+        for pattern in patterns:
+            try:
+                self.es.indices.delete(index=pattern)
+                # یا اگر با الیاس کار می‌کنید:
+                # es.indices.delete_alias(index=pattern, name="alias-...")
+            except NotFoundError:
+                # اگر هیچ ایندکسی با این الگو نبود، بی‌خیال بشو
+                continue
+
     def delete_agent(self, agent_id: str) -> bool:
         """
-        - Delete document by ID  
-        - Return False if not found, True otherwise  
+        1. اول ایندکس‌های ES مربوط به agent_id را حذف می‌کند
+        2. سپس رکورد ایجنت را از دیتابیس حذف می‌کند
+        Return False اگر در DB نبود، True در غیر اینصورت.
         """
         try:
+            # ۱) پاک کردن ایندکس‌های ES
+            # الگوی ایندکس‌هایتان را اینجا تنظیم کنید
+            # مثال: اگر ایندکس‌های vector/chunk دارید:
+            patterns = [
+                f"agents-{agent_id}-vectors-*",
+                f"agents-{agent_id}-chunks-*",
+                # اگر سایر الگوها هم هست اضافه کنید
+            ]
+            self.delete_agent_indices(self.es, agent_id, patterns)
+        
             self.es.delete(index=INDEX, id=agent_id)
             return True
         except NotFoundError:

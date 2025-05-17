@@ -6,6 +6,7 @@ def agents_indices_set_mapp(es, number_of_shards=1):
     settings_and_mappings = {
             "mappings": {
                 "properties": {
+                    "agent_id": {"type": "keyword"},
                     "name": {"type": "keyword"},
                     "description": {"type": "text"},
                     "welcome_message": {"type": "text"},

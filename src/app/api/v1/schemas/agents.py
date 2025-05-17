@@ -183,6 +183,7 @@ class AgentBase(BaseModel):
         alias="role",
         description="یکی از ۵ نقش مجاز: دستیار هوشمند (default)، برنامه‌نویس، حقوقدان، مترجم، مدیر پروژه"
     )
+    
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
